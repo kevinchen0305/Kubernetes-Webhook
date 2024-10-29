@@ -33,4 +33,42 @@ NAME                                 READY   STATUS    RESTARTS   AGE
 validation-webhook-c6c6b8fbb-8fbts   1/1     Running   0          17s
 ```
 
+## Testing
+When deploying a simple application using the Nginx image, the request is rejected by the admission webhook due to the absence of the "deployment" label
+```
+kubectl create deploy nginx --image=nginx
+error: failed to create deployment: admission webhook "validate.default.svc" denied the request: The label "development" isn't set!
+```
+```
+kubectl logs -f validation-webhook-c6c6b8fbb-8fbts
+[2024-04-12 06:02:35,911] ERROR in validate: Object Deployment/nginx doesn't have the required "development" label. Request rejected!
+```
+However, when giving the "deployment" label
+```Yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nginx
+    development: test
+  name: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+```
+```
+kubectl apply -f label.yaml
+deployment.apps/nginx created
+```
+
 # 📌 Mutating Webhook
