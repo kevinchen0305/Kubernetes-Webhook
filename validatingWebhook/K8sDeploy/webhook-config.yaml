@@ -1,0 +1,23 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: validating-webhook
+webhooks:
+  - name: validate.default.svc
+    failurePolicy: Fail
+    sideEffects: None
+    admissionReviewVersions: ["v1","v1beta1"]
+    rules:
+      - apiGroups: ["apps", ""]
+        resources:
+          - "deployments"
+        apiVersions:
+          - "*"
+        operations:
+          - CREATE
+    clientConfig:
+      service:
+        name: validate
+        namespace: default
+        path: /validate/
+      caBundle: YOUR ENCODED BASE64 CERT
