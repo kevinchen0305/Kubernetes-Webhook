@@ -71,4 +71,30 @@ kubectl apply -f label.yaml
 deployment.apps/nginx created
 ```
 
+## Let Validating Webhook only works on certain Namespace
+Create Namespace test-ns
+```bash
+kubectl create namespace test-ns
+```
+Check Namespace labels
+```bash
+kubectl get namespace default --show-labels
+
+NAME      STATUS   AGE    LABELS
+test-ns   Active   104s   kubernetes.io/metadata.name=test-ns
+```
+Modify webhook-config.yaml
+```Yaml
+webhooks:
+  - name: validate.default.svc
+    namespaceSelector:
+      matchLabels:
+        kubernetes.io/metadata.name: test-ns
+```
+Testing
+```bash
+kubectl create deploy nginx --image=nginx
+deployment.apps/nginx created
+```
+
 # 📌 Mutating Webhook
