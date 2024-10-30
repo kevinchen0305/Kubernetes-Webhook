@@ -98,3 +98,7 @@ deployment.apps/nginx created
 ```
 
 # 📌 Mutating Webhook
+## Create certificate
+```
+openssl req -x509 -sha256 -newkey rsa:2048 -keyout webhook.key -out webhook.crt -days 1024 -nodes -addext "subjectAltName = DNS.1:mutating-webhook.default.svc"
+```
